@@ -59,7 +59,8 @@ Deno.serve(async (request) => {
     const paymentId = body?.data?.id ??
       resourcePaymentId ??
       url.searchParams.get("id") ??
-      url.searchParams.get("data.id");
+      url.searchParams.get("data.id") ??
+      url.searchParams.get("data_id");
     const topic = body?.type ?? body?.topic ?? url.searchParams.get("topic") ??
       url.searchParams.get("type");
     if (!paymentId) return json({ ok: true, ignored: "missing id" }, 200, http);
@@ -106,6 +107,8 @@ Deno.serve(async (request) => {
     const externalReference = remote.external_reference
       ? String(remote.external_reference)
       : null;
+    
+    console.log(`[mercadopago-webhook] Processing providerId=${providerId}, extRef=${externalReference}, status=${remote.status}`);
     if (externalReference && externalReference.startsWith("mkt_")) {
       const orderId = externalReference.slice(4);
       const { data: order, error: orderError } = await admin
@@ -151,6 +154,7 @@ Deno.serve(async (request) => {
       raw: remote,
     });
     if (effectiveStatus === "approved") {
+      console.log(`[mercadopago-webhook] Finalizing payment ${payment.id} for approved status.`);
       await finalizePaymentIfApproved(admin, payment.id, payment.quantity ?? 1);
     }
     return json({ ok: true }, 200, http);
