@@ -146,10 +146,10 @@ Deno.serve(async (request) => {
     }
 
     // Fluxo Licenças de Planos
-    const query = admin.from("payments").select("*");
+    // Tenta primeiro pelo externalReference (nosso ID de pagamento interno)
     const { data: payment, error } = externalReference
-      ? await query.eq("id", externalReference).maybeSingle()
-      : await query.eq("provider_payment_id", providerId).maybeSingle();
+      ? await admin.from("payments").select("*").eq("id", externalReference).maybeSingle()
+      : await admin.from("payments").select("*").eq("provider_payment_id", providerId).maybeSingle();
     
     if (error) throw error;
     if (!payment) {
