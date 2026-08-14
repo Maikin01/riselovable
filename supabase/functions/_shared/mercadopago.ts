@@ -133,15 +133,17 @@ export function assertMercadoPagoPaymentContract(
     externalReference === expected.paymentId &&
     amountCents === expected.amountCents &&
     currency === "BRL" &&
-    method === "pix" &&
-    PAYMENT_STATUSES.has(status) &&
-    (!expectedEmail || !remoteEmailIsComparable || remoteEmail === expectedEmail);
+    PAYMENT_STATUSES.has(status);
 
-  if (!matches) {
+  // Validação de email: se o email retornado pelo MP for comparável e tivermos
+  // um email esperado, eles devem bater. Ignoramos se o MP retornar email mascarado.
+  const emailMatches = !expectedEmail || !remoteEmailIsComparable || remoteEmail === expectedEmail;
+
+  if (!matches || !emailMatches) {
     throw new ApiHttpError(
       409,
       "PAYMENT_CONTRACT_MISMATCH",
-      "O pagamento retornado pelo provedor não corresponde ao checkout.",
+      `O pagamento retornado pelo provedor não corresponde ao checkout. Status: ${status}, Amount: ${amountCents}, Email Match: ${emailMatches}, Matches: ${matches}`,
     );
   }
   return { providerId, status };

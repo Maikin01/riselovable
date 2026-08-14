@@ -59,7 +59,8 @@ Deno.serve(async (request) => {
     const paymentId = body?.data?.id ??
       resourcePaymentId ??
       url.searchParams.get("id") ??
-      url.searchParams.get("data.id");
+      url.searchParams.get("data.id") ??
+      url.searchParams.get("data_id");
     const topic = body?.type ?? body?.topic ?? url.searchParams.get("topic") ??
       url.searchParams.get("type");
     if (!paymentId) return json({ ok: true, ignored: "missing id" }, 200, http);
