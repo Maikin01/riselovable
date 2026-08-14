@@ -125,7 +125,8 @@ export function assertMercadoPagoPaymentContract(
   // (por exemplo, "XXXXXXXXXXX"). Isso não é uma divergência de pagador.
   const remoteEmailIsComparable = !!remoteEmail &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(remoteEmail) &&
-    !/^x+(@|$)/i.test(remoteEmail);
+    !/^x+(@|$)/i.test(remoteEmail) &&
+    !remoteEmail.includes("*");
 
   const matches = providerId.length > 0 &&
     (!expected.providerPaymentId ||
