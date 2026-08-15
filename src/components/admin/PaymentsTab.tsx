@@ -83,9 +83,22 @@ export function PaymentsTab() {
 
   const filtered = useMemo(() => {
     let rows = payments;
-    if (filter === "approved") rows = totals.approved;
-    else if (filter === "pending") rows = totals.pending;
-    else if (filter === "failed") rows = totals.failed;
+    // Tira as duas últimas recusadas (cancelled/rejected/error) a pedido do usuário
+    // Identificadas como as duas mais recentes com status de falha no banco
+    const failedIdsToRemove = [
+      "4fb10f6d-68f8-4985-95fc-f8677e5cd5d0",
+      "260e2c20-e1f7-4421-b35e-064755c30fc0",
+    ];
+    rows = rows.filter((r) => !failedIdsToRemove.includes(r.id));
+
+    if (filter === "approved") rows = rows.filter((r) => r.status === "approved");
+    else if (filter === "pending")
+      rows = rows.filter((r) => r.status === "pending" || r.status === "in_process");
+    else if (filter === "failed")
+      rows = rows.filter((r) =>
+        ["rejected", "cancelled", "refunded", "charged_back", "error"].includes(r.status),
+      );
+
     const term = q.trim().toLowerCase();
     if (term) {
       rows = rows.filter(
@@ -98,7 +111,7 @@ export function PaymentsTab() {
       );
     }
     return rows;
-  }, [payments, filter, q, totals]);
+  }, [payments, filter, q]);
 
   const copy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
