@@ -1162,6 +1162,18 @@ async function getCheckoutStatus(context: AuthContext, input: unknown) {
   let licenseKeys: string[] = [];
   if (payment.status === "approved") {
     licenseKeys = await finalizePaymentLicenses(context.admin, payment.id, quantity);
+  } else if (payment.status === "pending" || payment.status === "in_process") {
+    // Tenta uma reconciliação forçada se o status local ainda for pendente
+    await reconcilePendingPayments(context.admin, { userId: context.userId, limit: 5 });
+    const { data: updated } = await context.admin
+      .from("payments")
+      .select("status")
+      .eq("id", data.payment_id)
+      .maybeSingle();
+    if (updated?.status === "approved") {
+      payment.status = "approved";
+      licenseKeys = await finalizePaymentLicenses(context.admin, payment.id, quantity);
+    }
   }
   
   // Rede de segurança adicional: se ainda estiver pendente aqui, reconcilia uma última vez
