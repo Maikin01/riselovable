@@ -31,6 +31,7 @@ import { enforceRateLimit, sha256Hex } from "../_shared/rate-limit.ts";
 import { deliverMarketplaceOrder } from "../_shared/marketplace.ts";
 
 const ADMIN_ROLES = ["admin", "owner"];
+const RESELLER_ROLES = ["revendedor", "admin", "owner"];
 const rangeSchema = z.object({
   from: z.string().datetime().optional().nullable(),
   to: z.string().datetime().optional().nullable(),
@@ -678,7 +679,7 @@ async function adminListPayments(context: AuthContext) {
 }
 
 async function getMyResellerInfo(context: AuthContext) {
-  await assertRole(context.admin, context.userId, "revendedor");
+  await assertRole(context.admin, context.userId, RESELLER_ROLES);
   const profileResult = await context.admin
     .from("profiles")
     .select("id, full_name, referral_code")
@@ -706,7 +707,7 @@ async function getMyResellerInfo(context: AuthContext) {
 }
 
 async function getResellerStats(context: AuthContext, input: unknown) {
-  await assertRole(context.admin, context.userId, "revendedor");
+  await assertRole(context.admin, context.userId, RESELLER_ROLES);
   const range = rangeSchema.parse(input);
   let query = context.admin
     .from("payments")
