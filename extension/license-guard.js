@@ -44,10 +44,10 @@
     }
   }
 
-  // Inicia o loop de verificação (a cada 30 segundos)
+  // Inicia o loop de verificação (a cada 10 segundos para desconexão mais rápida)
   function startGuard() {
     if (checkTimer) clearInterval(checkTimer);
-    checkTimer = setInterval(checkLicenseStatus, 30000);
+    checkTimer = setInterval(checkLicenseStatus, 10000);
     checkLicenseStatus();
   }
 
