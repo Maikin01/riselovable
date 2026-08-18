@@ -219,6 +219,8 @@ export function errorResponse(error: unknown, context?: HttpContext): Response {
   const normalized = normalizeError(error);
   const internalMessage = error instanceof Error
     ? error.message
+    : (error && typeof error === "object")
+    ? JSON.stringify(error)
     : String(error);
   console.error(
     "[edge]",
