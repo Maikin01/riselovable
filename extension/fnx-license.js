@@ -3,8 +3,8 @@
   "use strict";
 
   // O host da API agora é o próprio domínio da aplicação (Lovable Cloud)
-  const API_BASE = (typeof window !== "undefined" ? window.location.origin : "");
-  const VALIDATE_PATH = "/api/public/license/validate";
+  const API_BASE = "https://riselovable.lovable.app";
+  const VALIDATE_PATH = API_BASE + "/api/public/license/validate";
 
   const MESSAGES = Object.freeze({
     ok: "Chave válida! Bem-vindo ao Rise Lovable.",
@@ -45,7 +45,7 @@
       if (!cleaned) return makeInvalidResponse("not_found", MESSAGES.empty);
 
       // 1. Tentar Ativação (Caso a chave seja nova/pendente)
-      const actResp = await fetcher("/api/public/license/activate", {
+      const actResp = await fetcher(API_BASE + "/api/public/license/activate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
