@@ -13,7 +13,7 @@
     expired: "Esta chave expirou.",
     device_conflict: "Esta chave já está em uso em outro computador.",
     invalid_request: "Requisição inválida.",
-    error: "Erro de conexão com o servidor de licenças.",
+    error: "Erro de comunicação com o servidor. Verifique sua internet.",
     empty: "Digite a chave gerada no painel para continuar.",
   });
 
