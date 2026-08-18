@@ -1,60 +1,21 @@
-// Fennix Store — ponte de licenciamento (sempre lifetime, sem API)
-// Qualquer key não-vazia é aceita como lifetime. String vazia/só espaços = rejeitada.
+// Fennix Store — ponte de licenciamento integrada ao Lovable Cloud
 (function () {
   "use strict";
 
-  const API_BASES = [
-    "https://lvbsonic.replit.app",
-  ];
-
-  const API_BASE = API_BASES[0] || "";
-  const VALIDATE_PATH = "/api/public/validate";
-  const RESET_PAGE = API_BASE + "/resetar-key";
+  // O host da API agora é o próprio domínio da aplicação (Lovable Cloud)
+  const API_BASE = (typeof window !== "undefined" ? window.location.origin : "");
+  const VALIDATE_PATH = "/api/public/license/validate";
 
   const MESSAGES = Object.freeze({
-    ok: "Key válida! Bem-vindo ao Fennix Store.",
-    not_found: "Key inválida. Verifique o código e tente novamente.",
-    revoked: "Esta key foi revogada.",
-    expired: "Esta key expirou.",
-    device_conflict: "Esta key está vinculada a outro dispositivo. Reset em: " + RESET_PAGE,
+    ok: "Chave válida! Bem-vindo ao Rise Lovable.",
+    not_found: "Chave inválida ou não encontrada no sistema.",
+    revoked: "Esta chave foi revogada.",
+    expired: "Esta chave expirou.",
+    device_conflict: "Esta chave já está em uso em outro computador.",
     invalid_request: "Requisição inválida.",
     error: "Erro de conexão com o servidor de licenças.",
-    empty: "Digite uma key válida para continuar.",
+    empty: "Digite a chave gerada no painel para continuar.",
   });
-
-  // Gera um session_id estável a partir da key (evita null/undefined)
-  function safeSessionId(key) {
-    try {
-      const k = String(key || "").trim();
-      if (!k) return "empty";
-      // Hash simples para não expor a key crua em logs, se houver
-      let h = 0;
-      for (let i = 0; i < k.length; i++) {
-        h = ((h << 5) - h + k.charCodeAt(i)) | 0;
-      }
-      return "fnx_" + Math.abs(h).toString(36) + "_" + k.length;
-    } catch (_) {
-      return "fnx_fallback";
-    }
-  }
-
-  function makeValidResponse(key) {
-    const session = safeSessionId(key);
-    return Object.freeze({
-      valid: true,
-      reason: null,
-      message: MESSAGES.ok,
-      expires_at: null,
-      activated_at: new Date().toISOString(),
-      status: "active",
-      license_type: "paid",
-      lifetime: true,
-      session_id: session,
-      user_name: "Usuario",
-      online_count: 0,
-      plan: "lifetime",
-    });
-  }
 
   function makeInvalidResponse(reason, message) {
     return Object.freeze({
@@ -74,43 +35,65 @@
   }
 
   /**
-   * Valida uma key localmente.
-   * - Key vazia / só espaços → rejeita (evita bug de ativar sem digitar nada)
-   * - Qualquer outro valor → lifetime válida
-   * Nunca faz request de rede.
+   * Valida uma chave contra a API real do backend.
+   * Não aceita mais ativação local/fake.
    */
   async function lvbValidate(fetcher, key, deviceId) {
     try {
       const cleaned = String(key == null ? "" : key).trim();
 
-      // Proteção principal: não aceita key vazia
       if (!cleaned) {
         return makeInvalidResponse("not_found", MESSAGES.empty);
       }
 
-      // Qualquer key com conteúdo → lifetime
-      return makeValidResponse(cleaned);
+      // Chama a API do backend (via background.js proxyFetch)
+      // O fetcher aqui é o bgFetch injetado pelo sidepanel.js
+      const response = await fetcher(VALIDATE_PATH, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          key: cleaned,
+          hwid: deviceId
+        })
+      });
+
+      if (!response || !response.valid) {
+        const reason = response ? response.reason : "error";
+        return makeInvalidResponse(reason, (response && response.message) || MESSAGES.not_found);
+      }
+
+      // Retorna o objeto de sucesso vindo da API
+      return Object.freeze({
+        valid: true,
+        reason: null,
+        message: response.message || MESSAGES.ok,
+        expires_at: response.expires_at,
+        activated_at: response.activated_at,
+        status: response.status,
+        license_type: response.license_type,
+        lifetime: !!response.lifetime,
+        session_id: response.session_id,
+        user_name: response.user_name || "Cliente",
+        online_count: response.online_count || 0,
+        plan: response.plan,
+      });
     } catch (err) {
-      // Fallback extremo: se algo explodir, ainda assim libera lifetime
-      // (melhor do que travar a extensão)
-      console.warn("[FNX] fnxValidate fallback:", err);
-      return makeValidResponse(key || "fallback");
+      console.error("[Rise] Erro na validação:", err);
+      return makeInvalidResponse("error", MESSAGES.error);
     }
   }
 
-  // Expõe no escopo global (window ou self/worker)
+  // Expõe no escopo global
   const root = (typeof window !== "undefined" && window) ||
                (typeof self !== "undefined" && self) ||
                (typeof globalThis !== "undefined" && globalThis) ||
                {};
 
   try {
-    root.LVB_API_BASE = API_BASE;
-    root.LVB_API_BASES = API_BASES.slice();
-    root.LVB_VALIDATE_URL = API_BASE + VALIDATE_PATH;
-    root.LVB_RESET_PAGE = RESET_PAGE;
     root.lvbValidate = lvbValidate;
   } catch (e) {
-    console.warn("[FNX] Falha ao expor globals:", e);
+    console.warn("[Rise] Falha ao expor lvbValidate:", e);
   }
 })();
