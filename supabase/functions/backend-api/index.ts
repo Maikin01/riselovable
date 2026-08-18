@@ -163,13 +163,16 @@ async function enforceBackendRateLimit(
         ? { scope: "backend-admin-mutation", limit: 60, windowSeconds: 60 }
         : { scope: "backend-general", limit: 180, windowSeconds: 60 };
 
+  const isSensitive = bucket.scope !== "backend-general";
+
   await enforceRateLimit(
     context.admin,
     bucket.scope,
     [context.userId, action],
     bucket.limit,
     bucket.windowSeconds,
-    { requestId },
+    // Leituras comuns não podem quebrar o painel se o limitador falhar.
+    { requestId, failOpen: !isSensitive },
   );
 }
 
