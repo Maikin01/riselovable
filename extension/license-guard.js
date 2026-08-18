@@ -22,7 +22,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           key: res.ql_license_key,
-          hwid: res.ql_hw_fingerprint
+          device_hash: res.ql_hw_fingerprint
         })
       });
 

@@ -39,6 +39,34 @@
    * Não aceita mais ativação local/fake.
    */
   async function lvbValidate(fetcher, key, deviceId) {
+    // Primeiro tentamos ativar (se for a primeira vez)
+    try {
+      const cleaned = String(key == null ? "" : key).trim();
+      if (!cleaned) return makeInvalidResponse("not_found", MESSAGES.empty);
+
+      // 1. Tentar Ativação (Caso a chave seja nova/pendente)
+      const actResp = await fetcher("/api/public/license/activate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: cleaned,
+          device_hash: deviceId,
+          ext_version: "32.0.4"
+        })
+      });
+
+      // Se a ativação funcionou ou se já estava ativa (device_conflict do activate pode ser ignorado se validarmos depois)
+      // O backend retorna valid: true no activate se for a primeira vez.
+      
+      // 2. Validação final (Garante o estado atualizado)
+      const response = await fetcher(VALIDATE_PATH, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: cleaned,
+          device_hash: deviceId
+        })
+      });
     try {
       const cleaned = String(key == null ? "" : key).trim();
 
@@ -55,7 +83,7 @@
         },
         body: JSON.stringify({
           key: cleaned,
-          hwid: deviceId
+          device_hash: deviceId
         })
       });
 
