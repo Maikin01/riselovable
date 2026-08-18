@@ -173,6 +173,8 @@ Deno.serve(async (request) => {
       raw: remote,
     });
 
+    console.log(`[mercadopago-webhook] Applied status ${effectiveStatus} for payment ${payment.id}.`);
+
     // Se aprovado, garantir a geração das chaves
     if (effectiveStatus === "approved") {
       console.log(`[mercadopago-webhook] Finalizing payment ${payment.id} for approved status.`);
