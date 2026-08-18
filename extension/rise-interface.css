@@ -1,0 +1,480 @@
+/* Rise Lovable visual layer.
+   The working extension controllers remain in the original Fennix files; this
+   stylesheet only maps their existing DOM onto the Rise interface. */
+
+:root {
+  --ts-brand-primary: #ff2a2a;
+  --ts-brand-primary-rgb: 255, 42, 42;
+  --ts-brand-primary-hover: #c50000;
+  --ts-brand-primary-soft: rgba(255, 42, 42, 0.12);
+  --ts-brand-primary-border: rgba(255, 60, 60, 0.35);
+  --ts-brand-primary-glow: rgba(255, 40, 40, 0.35);
+  --ts-brand-gradient: linear-gradient(180deg, #ff2a2a, #b80000);
+
+  --ql-bg: #0a0608;
+  --ql-bg-elevated: #14090c;
+  --ql-bg-surface: #1c1013;
+  --ql-bg-hover: #2a171c;
+  --ql-border: rgba(255, 60, 60, 0.14);
+  --ql-border-hover: rgba(255, 70, 70, 0.30);
+  --ql-text-primary: #f4eff0;
+  --ql-text-secondary: #a89ea1;
+  --ql-text-muted: #7a6f72;
+  --ql-accent: #ff2a2a;
+  --ql-accent-hover: #c50000;
+  --ql-accent-soft: rgba(255, 42, 42, 0.12);
+  --ql-accent-glow: rgba(255, 40, 40, 0.35);
+  --ql-accent-subtle: rgba(255, 40, 40, 0.08);
+  --ql-radius: 14px;
+  --ql-radius-sm: 10px;
+  --ql-radius-xs: 6px;
+}
+
+html,
+body {
+  min-width: 320px;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+body {
+  position: relative;
+  color: var(--ql-text-primary);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 30, 30, 0.16), transparent 55%),
+    linear-gradient(180deg, #14090c 0%, #0a0608 100%);
+  border: 1px solid rgba(255, 60, 60, 0.14);
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px rgba(255, 40, 40, 0.08), 0 20px 60px rgba(255, 20, 20, 0.15);
+  overflow: hidden;
+  animation: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.015) 0 2px, transparent 2px 8px);
+}
+
+/* The Rise popup uses a compact logo top bar, not a wide artwork banner. */
+.sp-banner { display: none !important; }
+
+.sp-header {
+  min-height: 53px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(30, 8, 10, .94), rgba(20, 6, 8, .64));
+  border-bottom: 1px solid var(--ql-border);
+}
+
+.sp-brand { gap: 8px; min-width: 0; }
+
+.sp-brand-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(255,40,40,.50));
+  flex: 0 0 32px;
+}
+
+.sp-brand-text {
+  color: #f4eff0 !important;
+  font: 700 12px/1.15 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  letter-spacing: .2px !important;
+}
+
+.sp-badge {
+  margin-left: 0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ff2a2a, #b80000) !important;
+  color: #fff !important;
+  font: 800 10px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  letter-spacing: .5px !important;
+  box-shadow: 0 0 8px rgba(255,40,40,.45), inset 0 1px 0 rgba(255,255,255,.20);
+}
+
+.sp-icon-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  color: var(--ql-text-secondary);
+}
+
+.sp-icon-btn:hover { color: #fff; background: rgba(255,255,255,.06); }
+
+.rise-minimize-btn {
+  display: inline-flex !important;
+  color: #a89ea1;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.sp-body {
+  padding: 12px 12px 0;
+  background: transparent;
+}
+
+#sp-tab-content {
+  margin: 0;
+  padding: 0 0 12px;
+  scrollbar-color: rgba(255,60,60,.28) transparent;
+}
+
+/* License verification screen */
+.sp-license-gate {
+  width: 100%;
+  min-height: calc(100vh - 94px);
+  padding: 18px !important;
+  justify-content: center;
+  gap: 14px;
+}
+
+.sp-login-logo {
+  width: 92px;
+  height: 92px;
+  margin: 4px 0 0;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 16px rgba(255,40,40,.35));
+}
+
+.sp-gate-title {
+  margin: 0;
+  color: #f4eff0;
+  font: 700 20px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -.2px;
+}
+
+.sp-gate-desc {
+  margin: -6px 0 6px;
+  color: #a89ea1;
+  font-size: 13px;
+}
+
+.sp-license-gate .sp-input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid rgba(255,70,70,.28);
+  border-radius: 14px;
+  background: rgba(0,0,0,.55);
+  color: #f4eff0;
+  font: 13px/1.3 "SF Mono", ui-monospace, Menlo, monospace;
+  text-align: center;
+  letter-spacing: .8px;
+}
+
+.sp-license-gate .sp-input::placeholder { color: #7a6f72; letter-spacing: 1.2px; }
+
+.sp-license-gate .sp-input:focus {
+  border-color: #ff2a2a !important;
+  background: rgba(0,0,0,.70);
+  box-shadow: 0 0 0 3px rgba(255,40,40,.15) !important;
+}
+
+.sp-license-gate .sp-btn-primary {
+  margin: -4px 0 0;
+  padding: 13px 18px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ff2a2a, #b80000) !important;
+  color: #fff !important;
+  font: 700 14px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: .3px;
+  text-transform: none;
+  box-shadow: 0 6px 18px rgba(255,30,30,.35), inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+.sp-license-gate .sp-btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 24px rgba(255,30,30,.50), inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+.sp-gate-actions { width: 100%; margin: -4px 0 0; }
+
+.sp-license-gate .sp-btn-buy {
+  width: 100%;
+  margin: 0;
+  padding: 12px 18px;
+  border: 1px solid rgba(255,70,70,.35);
+  border-radius: 14px;
+  background: transparent;
+  color: #f4eff0;
+  font-size: 13px;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.sp-license-gate .sp-btn-buy:hover {
+  background: rgba(255,40,40,.08);
+  border-color: rgba(255,60,60,.65);
+  box-shadow: 0 0 14px rgba(255,40,40,.20);
+}
+
+.sp-license-gate .sp-log {
+  width: 100%;
+  min-height: 14px;
+  margin-top: -2px;
+  font-size: 11px;
+}
+
+/* User/sync card */
+.sp-profile-card {
+  margin-bottom: 10px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255,60,60,.14);
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(40,16,20,.90), rgba(20,8,10,.84));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.sp-profile-card:hover { border-color: rgba(255,70,70,.28); }
+.sp-profile-top { align-items: center; margin-bottom: 8px; }
+.sp-profile-name { color: #f4eff0; font-size: 13px; font-weight: 700; }
+.sp-profile-left { gap: 7px; }
+.sp-profile-actions { gap: 5px; }
+
+.sp-profile-action {
+  width: 24px;
+  height: 24px;
+  color: #a89ea1;
+  border-radius: 6px;
+}
+
+.sp-profile-action:hover { opacity: 1; color: #fff; background: rgba(255,255,255,.06); }
+body:not(.sp-light) .sp-theme-icon { color: #a89ea1; }
+.sp-logout-btn { color: #ff6969; }
+
+.sp-status-badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 9px;
+  letter-spacing: .6px;
+}
+
+.sp-badge-pro { color: #5ce29a; border-color: rgba(41,214,122,.24); background: rgba(41,214,122,.09); }
+.sp-sync-status { color: #a89ea1; font-size: 11px; }
+.sp-sync-ok { color: #8ce5b4; }
+
+.sp-trial-countdown {
+  margin-top: 8px;
+  padding: 9px 10px;
+  border-color: rgba(255,60,60,.12);
+  background: rgba(0,0,0,.22);
+}
+.sp-countdown-time { color: #d4b048 !important; }
+.sp-trial-bar-fill { background: linear-gradient(90deg, #ff2a2a, #d4b048) !important; }
+
+/* Segmented navigation */
+.sp-tabs {
+  position: static;
+  margin-bottom: 10px;
+  padding: 3px;
+  gap: 3px;
+  overflow: visible;
+  border: 1px solid rgba(255,60,60,.12);
+  border-radius: 10px;
+  background: rgba(0,0,0,.34);
+}
+
+.sp-tab {
+  min-height: 32px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  color: #7a6f72;
+  font-size: 11px;
+}
+
+.sp-tab:hover { color: #a89ea1; background: rgba(255,255,255,.035); }
+.sp-tab.sp-tab-active { color: #fff; background: linear-gradient(180deg, #ff2a2a, #b80000); box-shadow: 0 0 9px rgba(255,40,40,.30); }
+.sp-tab.sp-tab-active::after { display: none; }
+.sp-tab-badge { height: 16px; min-width: 16px; padding: 0 4px; background: rgba(0,0,0,.28); font-size: 8px; }
+
+/* A área de Skills foi removida; o restante do sistema continua disponível. */
+#sp-skills-quick { display: none !important; }
+
+/* Prompt area: composer first, quick actions immediately below. */
+.sp-composer-shell { gap: 10px; overflow: visible; }
+.sp-compose-card { order: -2; }
+.sp-shortcuts-modern { order: -1; }
+
+.sp-compose-card {
+  min-height: 142px;
+  padding: 10px;
+  border: 1px solid rgba(255,60,60,.16);
+  border-radius: 12px;
+  background: rgba(14,5,7,.70);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.sp-compose-card:focus-within {
+  border-color: rgba(255,50,50,.58);
+  box-shadow: 0 0 0 2px rgba(255,40,40,.10), inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.sp-textarea-modern {
+  min-height: 82px;
+  height: 104px;
+  padding: 5px 4px 9px;
+  color: #f4eff0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.sp-textarea-modern::placeholder { color: #7a6f72; }
+
+.sp-compose-toolbar {
+  padding-top: 8px;
+  border-top-color: rgba(255,60,60,.11);
+}
+
+.sp-compose-tools { gap: 5px; }
+.sp-icon-tool {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255,60,60,.13);
+  border-radius: 8px;
+  background: rgba(255,255,255,.035);
+  color: #a89ea1;
+}
+.sp-icon-tool:hover {
+  color: #fff;
+  background: rgba(255,40,40,.11);
+  border-color: rgba(255,60,60,.35);
+}
+
+.sp-send-modern {
+  width: auto;
+  min-width: 72px;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #ff2a2a, #b80000) !important;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255,30,30,.30);
+}
+.sp-send-modern::before { content: "Enviar"; margin-right: 6px; font-size: 12px; font-weight: 700; }
+.sp-send-modern svg { width: 13px; height: 13px; }
+
+.sp-shortcuts-modern {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.sp-shortcuts-modern::before {
+  content: "ATALHOS RÁPIDOS";
+  grid-column: 1 / -1;
+  padding: 1px 2px 0;
+  color: #7a6f72;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.sp-chip-modern {
+  min-height: 38px;
+  aspect-ratio: auto;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid rgba(255,60,60,.11);
+  border-radius: 9px;
+  background: rgba(255,255,255,.03);
+  color: #a89ea1;
+  font-size: 9px;
+  text-align: left;
+}
+.sp-chip-modern:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,60,60,.35);
+  background: rgba(255,40,40,.09);
+  color: #f4eff0;
+  box-shadow: 0 4px 12px rgba(255,20,20,.12);
+}
+.sp-chip-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255,40,40,.08);
+  color: #a89ea1;
+  font-size: 13px;
+}
+
+.sp-mode-row { gap: 6px; padding-top: 0; }
+.sp-mini-action {
+  border: 1px solid rgba(255,60,60,.22);
+  border-radius: 9px;
+  background: rgba(255,40,40,.07);
+  color: #ffb1b1;
+}
+.sp-mini-action:hover { border-color: rgba(255,60,60,.45); background: rgba(255,40,40,.13); }
+
+/* History, skills and modal surfaces inherit the same Rise glass treatment. */
+.sp-history-item,
+.sp-skill-card,
+.sp-alert-box,
+.sp-modal,
+.sp-notif-panel {
+  border-color: rgba(255,60,60,.15) !important;
+  background: rgba(28,16,19,.97) !important;
+}
+
+.sp-footer {
+  min-height: 33px;
+  padding: 8px 12px;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(255,60,60,.11);
+  background: rgba(8,3,4,.48);
+}
+
+.sp-footer-badge {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #7a6f72 !important;
+  font-size: 9px;
+}
+
+.sp-log-error { color: #ff9a9a; }
+.sp-log-info { color: #ff6a6a; }
+.sp-log-success { color: #5ce29a; }
+
+/* Preserve the target's light-theme behavior while using Rise's neutral palette. */
+body.sp-light {
+  --ql-bg: #f4f6fa;
+  --ql-bg-elevated: #ffffff;
+  --ql-bg-surface: #ffffff;
+  --ql-bg-hover: #f0f2f7;
+  --ql-border: rgba(30,41,80,.10);
+  --ql-border-hover: rgba(220,38,38,.28);
+  --ql-text-primary: #171923;
+  --ql-text-secondary: #4a5170;
+  --ql-text-muted: #8790ab;
+  background: linear-gradient(180deg, #fff, #f4f6fa);
+  border-color: rgba(30,41,80,.10);
+}
+body.sp-light::before { display: none; }
+body.sp-light .sp-header { background: rgba(255,255,255,.94); border-color: rgba(30,41,80,.08); }
+body.sp-light .sp-brand-text { color: #b91c1c !important; }
+body.sp-light .sp-profile-card,
+body.sp-light .sp-compose-card { background: rgba(255,255,255,.92); border-color: rgba(30,41,80,.10); }
+body.sp-light .sp-tabs { background: #eef1f6; border-color: rgba(30,41,80,.08); }
+body.sp-light .sp-chip-modern { background: #fff; color: #4a5170; border-color: rgba(30,41,80,.10); }
+body.sp-light .sp-license-gate .sp-input { background: #fff; color: #171923; }
+
+@media (max-width: 350px) {
+  .sp-header { padding-left: 9px; padding-right: 9px; }
+  .sp-body { padding-left: 9px; padding-right: 9px; }
+  .sp-shortcuts-modern { gap: 5px; }
+  .sp-chip-modern { padding-left: 6px; padding-right: 6px; }
+}
+
+@media (max-height: 600px) {
+  .sp-shortcuts-modern { display: grid; }
+  .sp-license-gate { min-height: auto; padding-top: 10px !important; }
+  .sp-login-logo { width: 72px; height: 72px; }
+}
