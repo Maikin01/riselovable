@@ -3,8 +3,8 @@
   "use strict";
 
   // O host da API agora é o próprio domínio da aplicação (Lovable Cloud)
-  const API_BASE = (typeof window !== "undefined" ? window.location.origin : "");
-  const VALIDATE_PATH = "/api/public/license/validate";
+  const API_BASE = "https://riselovable.lovable.app";
+  const VALIDATE_PATH = API_BASE + "/api/public/license/validate";
 
   const MESSAGES = Object.freeze({
     ok: "Chave válida! Bem-vindo ao Rise Lovable.",
@@ -36,46 +36,30 @@
 
   /**
    * Valida uma chave contra a API real do backend.
-   * Não aceita mais ativação local/fake.
+   * Agora realiza a tentativa de ativação automática antes da validação.
    */
   async function lvbValidate(fetcher, key, deviceId) {
-    // Primeiro tentamos ativar (se for a primeira vez)
     try {
       const cleaned = String(key == null ? "" : key).trim();
       if (!cleaned) return makeInvalidResponse("not_found", MESSAGES.empty);
 
       // 1. Tentar Ativação (Caso a chave seja nova/pendente)
-      const actResp = await fetcher("/api/public/license/activate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          key: cleaned,
-          device_hash: deviceId,
-          ext_version: "32.0.4"
-        })
-      });
-
-      // Se a ativação funcionou ou se já estava ativa (device_conflict do activate pode ser ignorado se validarmos depois)
-      // O backend retorna valid: true no activate se for a primeira vez.
-      
-      // 2. Validação final (Garante o estado atualizado)
-      const response = await fetcher(VALIDATE_PATH, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          key: cleaned,
-          device_hash: deviceId
-        })
-      });
-    try {
-      const cleaned = String(key == null ? "" : key).trim();
-
-      if (!cleaned) {
-        return makeInvalidResponse("not_found", MESSAGES.empty);
+      // O endpoint /activate é idempotente para o mesmo device_hash.
+      try {
+        await fetcher(API_BASE + "/api/public/license/activate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            key: cleaned,
+            device_hash: deviceId,
+            ext_version: "32.0.4"
+          })
+        });
+      } catch (actErr) {
+        console.warn("[Rise] Falha ou já ativa no endpoint de ativação:", actErr);
       }
 
-      // Chama a API do backend (via background.js proxyFetch)
-      // O fetcher aqui é o bgFetch injetado pelo sidepanel.js
+      // 2. Validação final
       const response = await fetcher(VALIDATE_PATH, {
         method: "POST",
         headers: {
