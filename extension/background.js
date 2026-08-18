@@ -125,6 +125,15 @@ chrome.action.onClicked.addListener(async (tab) => {
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg && msg.action === "tsClosePanel") {
+    console.warn("[Background] Recebido comando de fechar painel (licença expirada).");
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, { type: "TS_TOGGLE_OVERLAY", forceClose: true }, () => void chrome.runtime.lastError);
+      });
+    });
+    return true;
+  }
 
   if (msg && msg.action === "getUpdateStatus") {
     refreshExtensionBlockState(true).then((state) => sendResponse({ ok: true, blocked: state.blocked, data: state.data }));
