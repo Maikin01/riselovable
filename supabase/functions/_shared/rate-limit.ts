@@ -42,12 +42,22 @@ export async function consumeRateLimit(
   const keyHash = await sha256Hex(
     [scope, ...keyParts.map((part) => part ?? "")].join("\u001f"),
   );
-  const { data, error } = await admin.rpc("consume_edge_rate_limit", {
-    p_scope: scope,
-    p_key_hash: keyHash,
-    p_limit: limit,
-    p_window_seconds: windowSeconds,
-  });
+  const callRpc = () =>
+    admin.rpc("consume_edge_rate_limit", {
+      p_scope: scope,
+      p_key_hash: keyHash,
+      p_limit: limit,
+      p_window_seconds: windowSeconds,
+    });
+
+  // Chamadas simultâneas na mesma chave podem colidir (unique violation /
+  // deadlock). Uma nova tentativa resolve sem derrubar a requisição.
+  let { data, error } = await callRpc();
+  if (error) {
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    ({ data, error } = await callRpc());
+  }
+
 
   if (error) {
     if (options.failOpen) {
