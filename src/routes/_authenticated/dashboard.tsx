@@ -14,7 +14,7 @@ import {
   type LicenseWithRelations,
 } from "@/lib/api/license-api";
 import { QueryErrorState } from "@/components/QueryErrorState";
-import { LICENSE_STATUS_LABEL, formatDateBR } from "@/lib/license-utils";
+import { LICENSE_STATUS_LABEL, formatDateBR, formatDaysLeft } from "@/lib/license-utils";
 
 function useCountdown(target: string | null | undefined) {
   const [now, setNow] = useState(() => Date.now());
