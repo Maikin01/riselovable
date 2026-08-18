@@ -1,8 +1,16 @@
 /**
  * Formata dias restantes em texto amigável.
  */
-export function formatDaysLeft(expiresAt: string | null | undefined): string {
-  if (!expiresAt) return "—";
+export function formatDaysLeft(expiresAt: string | null | undefined, customMinutes?: number | null): string {
+  if (!expiresAt) {
+    if (customMinutes) {
+      const days = Math.floor(customMinutes / 1440);
+      if (days > 0) return `${days} ${days === 1 ? "dia" : "dias"}`;
+      const hours = Math.floor(customMinutes / 60);
+      return `${hours}h`;
+    }
+    return "—";
+  }
   const diff = new Date(expiresAt).getTime() - Date.now();
   if (diff <= 0) return "Expirada";
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));

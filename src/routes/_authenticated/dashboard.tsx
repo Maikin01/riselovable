@@ -283,7 +283,9 @@ function LicenseRow({ license, isCurrent }: { license: LicenseWithRelations; isC
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <Badge className="chip-neon border-0" variant={badgeVariant}>
-          {license.plans?.name ?? LICENSE_STATUS_LABEL[status] ?? status}
+          {license.plans?.slug === "monthly" && license.custom_duration_minutes
+            ? `Duração: ${formatDaysLeft(null, license.custom_duration_minutes)}`
+            : license.plans?.name ?? LICENSE_STATUS_LABEL[status] ?? status}
         </Badge>
         {isDeletedTrial ? (
           <span className="text-xs text-destructive">
@@ -295,7 +297,9 @@ function LicenseRow({ license, isCurrent }: { license: LicenseWithRelations; isC
           </span>
         ) : (
           <span className="text-xs text-muted-foreground">
-            O tempo começa na primeira ativação na extensão
+            {license.custom_duration_minutes 
+              ? `Duração de ${formatDaysLeft(null, license.custom_duration_minutes)} (inicia na ativação)`
+              : "O tempo começa na primeira ativação na extensão"}
           </span>
         )}
         {isCurrent && countdown && (
