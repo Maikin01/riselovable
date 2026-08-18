@@ -493,3 +493,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   })();
   return true;
 });
+
+// Monitor de Licença Rise
+try {
+  importScripts('license-guard.js');
+} catch(e) {
+  console.warn("[Background] Falha ao carregar license-guard.js:", e);
+}

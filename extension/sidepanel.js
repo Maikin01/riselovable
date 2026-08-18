@@ -116,7 +116,7 @@ function isTrialLicense() {
 }
 
 function isLifetimeLicense() {
-  return true;
+  return !!licenseLifetime;
 }
 
   async function refreshLovableTokenFromActiveTab() {
@@ -610,18 +610,20 @@ const soundBtn = e.target.closest('.sp-sound-btn');
     return;
   }
 
-const logoutBtn = e.target.closest('.sp-logout-btn');
+  const logoutBtn = e.target.closest('.sp-logout-btn');
   if (logoutBtn) {
     if (heartbeatInterval) clearInterval(heartbeatInterval);
 
     chrome.storage.local.remove(
-      ["ql_license_valid","ql_license_key","ql_session_id","ql_user_name","ql_expires_at","ql_activated_at","ql_license_status"],
+      ["ql_license_valid","ql_license_key","ql_session_id","ql_user_name","ql_expires_at","ql_activated_at","ql_license_status", "ql_license_type", "ql_license_lifetime"],
       () => {
         userName = null;
         expiresAt = null;
         licenseStatus = null;
         sessionId = null;
         licenseKey = null;
+        licenseLifetime = false;
+        licenseType = null;
         showLicenseGate();
       }
     );
