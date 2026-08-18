@@ -81,7 +81,7 @@ export function MarketplacePixDialog({
       }
     };
     void tick();
-    pollRef.current = window.setInterval(tick, 4000) as unknown as number;
+    pollRef.current = window.setInterval(tick, 3000) as unknown as number;
     return () => {
       if (pollRef.current) window.clearInterval(pollRef.current);
     };

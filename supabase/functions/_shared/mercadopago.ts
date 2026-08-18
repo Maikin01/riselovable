@@ -122,11 +122,12 @@ export function assertMercadoPagoPaymentContract(
     : String(payer.email).trim().toLowerCase();
   const expectedEmail = expected.buyerEmail?.trim().toLowerCase() || null;
   // A consulta autenticada do Mercado Pago mascara PII em pagamentos antigos
-  // (por exemplo, "XXXXXXXXXXX"). Isso não é uma divergência de pagador.
+  // (por exemplo, "XXXXXXXXXXX" ou "m***@gmail.com"). Isso não é uma divergência de pagador.
   const remoteEmailIsComparable = !!remoteEmail &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(remoteEmail) &&
     !/^x+(@|$)/i.test(remoteEmail) &&
-    !remoteEmail.includes("*");
+    !remoteEmail.includes("*") &&
+    !remoteEmail.includes("...");
 
   const matches = providerId.length > 0 &&
     (!expected.providerPaymentId ||
